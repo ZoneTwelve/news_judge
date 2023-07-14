@@ -11,6 +11,6 @@ from langchain.prompts.chat import (
 
 # Configrations
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+#openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
