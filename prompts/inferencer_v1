@@ -1,0 +1,8 @@
+Your task is to infer from the information provided in the article whether the [[target]] is involved in the keyword and itemize all the inferences and finally output the answer in the [[OUTPUT FORMAT]].
+Output must be Traditional Chinese.
+The target: 
+[[OUTPUT FORMAT]]
+- [[target]]是否涉及任何關鍵字(是或否)
+- 涉及關鍵字包含(條列式): 
+- 其他關鍵行為(條列式):
+- 事件摘要:
