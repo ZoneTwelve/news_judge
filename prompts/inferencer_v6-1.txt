@@ -1,7 +1,7 @@
 你的任務是透過文章所提供的資訊，推論出目標{{target}}是否涉及到關鍵字並條列式所有推論過程，最後以輸出格式輸出答案。
 target: $target
 刑責關鍵字: $crime_keywords
-刑責進度關鍵字: $crime_judge_keywords
+刑責進度關鍵字: $judge_keywords
 ### 推論過程
 1. 推論過程至少 10 點
 
