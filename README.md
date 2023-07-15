@@ -35,3 +35,15 @@ A configration based crawler, that can fetch almost all the website.
   }
 }
 ```
+
+## Prompt.py Exmaple
+```bash
+./prompt.py --config prompts/inferencer_v7.json \
+            --target samples/case1/target_1.txt \
+            --news-title samples/case1/news_title.txt \
+            --news-content samples/case1/news_content.txt \
+            --crime-keywords samples/case1/crime_keywords.txt \
+            --judge-keywords samples/case1/judge_keywords.txt
+
+```
+exmaple output: [inferencer v7](prompts/test/1.inferencer_v7.out)
