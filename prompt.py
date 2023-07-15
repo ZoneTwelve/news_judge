@@ -30,40 +30,75 @@ print(f"You're using '{prompt_config['name']}'")
 
 
 # Define the prompt for generating text
-prompt_file = os.path.join(dirname, prompt_config['file'])
-with open(prompt_file, encoding='utf-8') as file:
-  prompt = file.read()
-print(prompt)
-
+prompt_mode = 0
+if 'file' in prompt_config:
+  mode = 1
+  prompt_file = os.path.join(dirname, prompt_config['file'])
+  with open(prompt_file, encoding='utf-8') as file:
+    prompt = file.read()
+  print(prompt)
+elif 'files' in prompt_config:
+  mode = 2
+  prompt_files = dict()
+  files = prompt_config['files']
+  for key in files:
+    pfile = os.path.join(dirname, files[key])
+    with open(pfile, encoding='utf8') as file:
+      prompt_files[key] = file.read()
+else:
+  print("=== Can not get the prompt file(s) ===")
+  exit()
 
 def prompt_conversion(prompt, keys, inputs):
-  print(inputs)
   final_prompt = prompt
   for key in keys:
-    print('READ', inputs[key])
     with open(inputs[key]) as file:
       c = file.read() # content
     final_prompt = final_prompt.replace(f'${key}', c)
-  print('--- final prompt ---')
-  print(final_prompt)
-  print('-'*20)
-prompt_conversion( prompt=prompt, keys=prompt_config['inputs'], inputs=vars(args) )
-# exit()
+  return final_prompt
+
 # Define the temperature for controlling the randomness of the output
-temperature = 0.0
+# Need turn this into a modules
+def submit( system_content, user_content ):
+  
+  response = openai.ChatCompletion.create(
+      model="gpt-3.5-turbo",
+      messages=[
+          {"role": "system", "content": system_content},
+          {"role": "user", "content": user_content},
+      ],
+      temperature=0.0
+  )
+  
+  print('--- Response ---')
+  print('-'*20)
+  print(response)
+  result = response['choices'][0]['message']['content']
+  #print(result)
+  return result
 
-# Generate text using the OpenAI API
-response = openai.Completion.create(
-    engine="gpt-3.5-turbo",
-    prompt=prompt,
-    max_tokens=100,
-    temperature=temperature,
-    n=1,
-    stop=None,
-)
 
-# Extract the generated text from the API response
-generated_text = response.choices[0].text.strip()
 
-# Print the generated text
-print(generated_text)
+if mode == 1:
+  prompt_conversion( prompt=prompt, keys=prompt_config['inputs'], inputs=vars(args) )
+elif mode == 2:
+  for key in prompt_files:
+    p = prompt_files[key]
+    print(key, p)
+    prompt_files[key] = prompt_conversion(
+                          prompt=p,
+                          keys=prompt_config['inputs'],
+                          inputs=vars(args)
+                        )
+  print(prompt_files)
+  result = submit(
+    system_content= prompt_files['system'], 
+    user_content  = prompt_files['user']
+  )
+  print("=== Result ===")
+  print(result)
+  print("="*20)
+else:
+  print("Not Ready")
+# exit()
+

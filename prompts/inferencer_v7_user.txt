@@ -1,0 +1,6 @@
+### 文章
+標題:
+$news_title
+
+內容:
+$news_content
