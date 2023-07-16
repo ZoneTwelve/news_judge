@@ -1,0 +1,9 @@
+### 資訊
+target: $target
+
+### 文章
+標題:
+$news_title
+
+內容:
+$news_content

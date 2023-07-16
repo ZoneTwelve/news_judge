@@ -1,0 +1,14 @@
+{
+  "name": "inferencer v8 multi-role",
+  "files": {
+    "system": "inferencer_v8_system.txt",
+    "user": "inferencer_v8_user.txt"
+  },
+  "inputs": {
+    "target": "The target you are looking for",
+    "crime_keywords": "What kind of crime he might do.",
+    "judge_keywords": "The keyword will exist in the judgement",
+    "news_title": "The news title",
+    "news_content": "The news content"
+  }
+}
