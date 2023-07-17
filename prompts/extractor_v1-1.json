@@ -1,0 +1,10 @@
+{
+    "name": "Extractor V1",
+    "files": {
+        "system": "extractor_v1-1_system.txt",
+        "user": "extractor_v1_user.txt"
+    },
+    "inputs": {
+        "news_content": "The news content"
+    }
+}
