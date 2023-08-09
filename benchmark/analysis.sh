@@ -17,7 +17,7 @@ NEWS_CONTENT=$(cat)
 
 # check output.csv exist or not, if not create it with default header
 if [ ! -f outputs/output.csv ]; then
-    echo "新聞連結,犯罪人與公司,刑責,刑責進度,摘要" >> outputs/output.csv
+    echo "新聞連結,犯罪人與公司,刑責,刑責進度,摘要" >> outputs/output-A.csv
 fi
 declare -A xpaths=(
     ['www.ettoday.net']='//*[@id="society"]/div[4]/div[2]/div[9]/div/div/div[1]/div[1]/article/div'
@@ -56,7 +56,7 @@ $NEWS_CONTENT
 
 extractor_result=$(submit "$sys_prompt_1" "$usr_prompt")
 content=$(echo "$extractor_result" | sed 's/犯罪人與公司: //')
-echo "$NEWS_URL,$content" >> outputs/output-instance.csv
+echo "$NEWS_URL,$content" >> outputs/output-instance-A.csv
 
 echo "所有目標: $content"
 delimiter=","
@@ -93,7 +93,7 @@ for element in "${array[@]}"; do
 
     csv_output="$NEWS_URL,$criminal_company,$criminal_penalty,$criminal_progress,$summary"
     # echo -n "$csv_output" >> output.csv
-    echo "$csv_output" >> outputs/output.csv
+    echo "$csv_output" >> outputs/output-A.csv
 done
 # while IFS= read -r line; do
 #     # news_url="$line"

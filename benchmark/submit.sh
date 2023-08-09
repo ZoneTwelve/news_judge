@@ -16,8 +16,11 @@ submit() {
     output=$(curl -s https://api.openai.com/v1/chat/completions \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer $OPENAI_API_KEY" \
-      -d "$data" | jq -r '.choices[0].message.content')
-    echo "$output"
+      -d "$data")
+    # save the output into logs/$(date +"%s").log
+    echo "$output" >> logs/$(date +"%s").log
+    result=$(echo $output | jq -r '.choices[0].message.content')
+    echo "$result"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

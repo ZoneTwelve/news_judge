@@ -21,6 +21,9 @@ import subprocess
 # threads
 import threading
 
+# for md5
+import hashlib
+
 
 
 
@@ -32,6 +35,11 @@ def parse_xpath(html, xpath):
     root = etree.HTML(html)
     result = root.xpath(xpath)
     return result
+
+def md5(string):
+    md5_hash = hashlib.md5()
+    md5_hash.update(string.encode('utf-8'))
+    return md5_hash.hexdigest()
 
 def analysis( news_url ):
     try:
@@ -46,12 +54,13 @@ def analysis( news_url ):
         news_html = soup.select(sel)
         news_content = news_html[0].text
         # pass arguments to main.sh
-        
-        process = subprocess.Popen(['./analysis.sh', news_url], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        # process = subprocess.Popen(['./analysis.sh', news_url], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         # Pass the news_content to main.sh through the pipe
-        output, error = process.communicate(input=news_content)
-        print(output)
+        # output, error = process.communicate(input=news_content)
+        # print(output)
+        return news_content
     except:
         print('Error', news_url)
         pass
@@ -75,31 +84,48 @@ if __name__ == "__main__":
         'finance.ettoday.net': '#finance > div.wrapper_box > div.wrapper > div.container_box > div > div.r1.clearfix > div.c1 > div.subject_article > div.story',
         'ctee.com.tw': 'div.entry-content.clearfix.single-post-content'
     }
+    for news in news_source:
+        try:
+            print(news)
+            host = urlparse(news).netloc
+            print(host)
+            print(xpaths[host])
+            print(css_selector[host])
+            print('-----------------------')
+            result = analysis(news)
+            # html = get_html(news)
+            # save post in posts/md5(news_url).md
+            with open('posts/' + md5(news) + '.md', 'w') as f:
+                    f.write(result + '\n')
+                    f.write(f'Reference: {news}\n')
+                    f.close()
+        except:
+            pass
     # check output.csv exist or not, if not create it with default header
-    if not os.path.exists('output.csv'):
-        with open('output.csv', 'w') as f:
-            f.write('新聞連結,犯罪人與公司,刑責,刑責進度,摘要\n')
+    # if not os.path.exists('output.csv'):
+    #     with open('output.csv', 'w') as f:
+    #         f.write('新聞連結,犯罪人與公司,刑責,刑責進度,摘要\n')
     # create threads
-    num_threads = 3
+    # num_threads = 3
 
     # Divide the array into chunks for each thread
-    chunk_size = len(news_source) // num_threads
-    chunks = [news_source[i:i+chunk_size] for i in range(0, len(news_source), chunk_size)]
+    # chunk_size = len(news_source) // num_threads
+    # chunks = [news_source[i:i+chunk_size] for i in range(0, len(news_source), chunk_size)]
 
-    # Create a thread for each chunk of the array
-    threads = []
-    complete = 0
-    for chunk in chunks:
-        thread = threading.Thread(target=lambda items: [analysis(item) for item in items], args=(chunk,))
-        threads.append(thread)
-        thread.start()
+    # # Create a thread for each chunk of the array
+    # threads = []
+    # complete = 0
+    # for chunk in chunks:
+    #     thread = threading.Thread(target=lambda items: [analysis(item) for item in items], args=(chunk,))
+    #     threads.append(thread)
+    #     thread.start()
 
-    # Wait for all threads to finish
-    for thread in threads:
-        complete += 1
-        print(f'Progress: {complete}/{chunk_size}')
-        thread.join()
+    # # Wait for all threads to finish
+    # for thread in threads:
+    #     complete += 1
+    #     print(f'Progress: {complete}/{chunk_size}')
+    #     thread.join()
 
-    
+
     # for news_url in news_source:
-        
+
