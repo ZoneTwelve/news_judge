@@ -1,15 +1,33 @@
-aiohttp==3.8.4
-aiosignal==1.3.1
-async-timeout==4.0.2
-attrs==23.1.0
-certifi==2023.5.7
-charset-normalizer==3.2.0
-frozenlist==1.4.0
-idna==3.4
-multidict==6.0.4
-openai==0.27.8
-python-dotenv==1.0.0
-requests==2.31.0
-tqdm==4.65.0
-urllib3==2.0.3
-yarl==1.9.2
+# Production Dependencies
+
+# OpenAI API client (updated to v1.x for custom base URL support)
+openai>=1.0.0
+
+# Environment variable management
+python-dotenv>=1.0.0
+
+#  Gradio web interface
+gradio>=4.0.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Async HTTP (for future enhancements)
+aiohttp>=3.9.0
+
+# Required by aiohttp
+aiosignal>=1.3.1
+async-timeout>=4.0.2
+frozenlist>=1.4.0
+yarl>=1.9.2
+
+# Common dependencies
+certifi>=2023.5.7
+charset-normalizer>=3.2.0
+idna>=3.4
+multidict>=6.0.4
+attrs>=23.1.0
+urllib3>=2.0.3

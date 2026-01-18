@@ -21,7 +21,7 @@ for(let site in example){
   console.log(site, config);
 }
 
-let input_url = "https://fakenews.exmaple-news.com:8080/post/business/168936864";
+let input_url = "https://fakenews.example-news.com:8080/post/business/168936864";
 
 let parse_url = url.parse(input_url, false);
 

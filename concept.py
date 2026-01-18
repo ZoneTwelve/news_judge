@@ -1,11 +1,19 @@
 #!/usr/bin/env python
+"""
+Concept demonstration for configuration-based web crawler.
+
+This module demonstrates the pattern for creating XPath-based crawler
+configurations that can extract content from various news websites.
+"""
+
 from urllib.parse import urlparse
 
+# Example crawler configuration pattern
 example = {
     'a': {
         'title': '#title',
         'content': '#content',
-        'reporter': '#repoter_name',
+        'reporter': '#reporter_name',
         'extra_img_alt': '#cover[alt]',
     },
     'b': {
@@ -21,6 +29,6 @@ for site, config in example.items():
     print(site, config)
 
 
-input_url = "https://fakenews.exmaple-news.com:8080/post/business/168936864"
+input_url = "https://news.example.com:8080/post/business/168936864"
 parse_url = urlparse(input_url)
 print(parse_url.netloc)

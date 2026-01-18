@@ -1,22 +1,58 @@
 #!/usr/bin/env python
+"""
+Demo Web Interface for News Inferencer.
+
+Provides a Gradio-based web interface for interactive legal analysis of news articles.
+Users can select extractor/inferencer configurations, provide keywords, and paste
+news content to receive structured analysis results.
+"""
+
 import os
 import gradio as gr
 import prompt
 import json
 import re
+from typing import Dict, List, Any
 
-def analysis(extractor_conf, inferencer_conf, crime_keywords_file, judge_keywords_file, news_content):
+
+def analysis(
+    extractor_conf: str,
+    inferencer_conf: str,
+    crime_keywords_file: str,
+    judge_keywords_file: str,
+    news_content: str
+) -> str:
+    """
+    Main analysis pipeline that extracts subjects and infers legal liability.
+    
+    This function orchestrates the two-stage analysis:
+    1. Extract all subjects mentioned in the news article
+    2. For each subject, analyze their legal liability
+    
+    Args:
+        extractor_conf: Extractor configuration filename (from prompts/)
+        inferencer_conf: Inferencer configuration filename (from prompts/)
+        crime_keywords_file: Crime keywords filename (from samples/)
+        judge_keywords_file: Legal proceeding keywords filename (from samples/)
+        news_content: Raw news article text
+        
+    Returns:
+        Markdown-formatted analysis results with detected subjects and
+        their legal liability assessments
+    """
     dirname = os.path.dirname(__file__)
     crime_keywords = open(os.path.join(dirname, 'samples', crime_keywords_file)).read()
     judge_keywords = open(os.path.join(dirname, 'samples', judge_keywords_file)).read()
     extractor = complete(extractor_conf, crime_keywords, judge_keywords, news_content)
     inferencer = complete(inferencer_conf, crime_keywords, judge_keywords, news_content)
-    print( extractor, inferencer )
-    # execute the pipeline
+    print(extractor, inferencer)
+    
+    # Execute the pipeline
     extractor_result = prompt.submit(
-        system_content= extractor['files']['system'],
-        user_content  = extractor['files']['user']
+        system_content=extractor['files']['system'],
+        user_content=extractor['files']['user']
     )
+    
     # users = get_users(response['choices'][0]['message']['content'])
     # convert users array to string
     # Only support extractor_v1-1.json, extractor_v1-2.json
@@ -31,8 +67,8 @@ def analysis(extractor_conf, inferencer_conf, crime_keywords_file, judge_keyword
         user_list += f'\n- {user}\n'
         print(inferencer['files']['user'].replace('$target', user))
         inferencer_result = prompt.submit(
-            system_content= inferencer['files']['system'],
-            user_content  = inferencer['files']['user'].replace('$target', user)
+            system_content=inferencer['files']['system'],
+            user_content=inferencer['files']['user'].replace('$target', user)
         )
         print()
         user_result = inferencer_result['choices'][0]['message']['content'].split("### 輸出格式\n").pop()
@@ -43,9 +79,9 @@ def analysis(extractor_conf, inferencer_conf, crime_keywords_file, judge_keyword
         for res in user_result.split("\n"):
             content = res.split(": ")
             output += f"- {keys[progress]}: {content[1]}\n<br>\n"
-            progress+=1
+            progress += 1
 
-        # haedcoded
+        # hardcoded
         ## Regex
         ## 討論的主體(target): (.*)
         ## 是否涉及任何刑責關鍵字(是或否): (是|否)
@@ -75,7 +111,7 @@ def analysis(extractor_conf, inferencer_conf, crime_keywords_file, judge_keyword
         # # hardcode end
         # print(user_result)
         print(output)
-        print("="*10)
+        print("=" * 10)
         analysis_result += f'\n### {user}\n<details>\n{output}</details>\n'
     return f"""
     # 檢測結果
@@ -86,12 +122,40 @@ def analysis(extractor_conf, inferencer_conf, crime_keywords_file, judge_keyword
     {analysis_result}
     """
 
-def read_config(config_file):
+
+def read_config(config_file: str) -> Dict[str, Any]:
+    """
+    Load JSON configuration file.
+    
+    Args:
+        config_file: Path to JSON configuration file
+        
+    Returns:
+        Parsed configuration dictionary
+    """
     with open(config_file) as file:
         config = json.load(file)
     return config
 
-def complete( conf_file, crime_keywords, judge_keywords, news_content ):
+
+def complete(
+    conf_file: str,
+    crime_keywords: str,
+    judge_keywords: str,
+    news_content: str
+) -> Dict[str, Any]:
+    """
+    Load configuration and prepare prompts with variable substitution.
+    
+    Args:
+        conf_file: Configuration filename (relative to prompts/)
+        crime_keywords: Crime keywords content
+        judge_keywords: Legal proceeding keywords content
+        news_content: News article content
+        
+    Returns:
+        Configuration dictionary with prompts ready for submission
+    """
     inputs = {
         'crime_keywords': crime_keywords,
         'judge_keywords': judge_keywords,
@@ -100,19 +164,21 @@ def complete( conf_file, crime_keywords, judge_keywords, news_content ):
     dirname = os.path.dirname(__file__)
     conf = read_config(os.path.join(dirname, 'prompts', conf_file))
     for file in conf['files']:
-        prompt = open(os.path.join(dirname, 'prompts', conf['files'][file])).read()
+        prompt_text = open(os.path.join(dirname, 'prompts', conf['files'][file])).read()
         for key in conf['inputs']:
             if key in inputs:
-                prompt = prompt.replace(f'${key}', inputs[key])
+                prompt_text = prompt_text.replace(f'${key}', inputs[key])
             else:
                 print("Can not find the key: ", key)
-        conf['files'][file] = prompt
+        conf['files'][file] = prompt_text
     return conf
+
     
-_ExtractorList  = [file for file in os.listdir('./prompts') if file.startswith('extractor')  and file.endswith('.json')]
+_ExtractorList = [file for file in os.listdir('./prompts') if file.startswith('extractor') and file.endswith('.json')]
 _InferencerList = [file for file in os.listdir('./prompts') if file.startswith('inferencer') and file.endswith('.json')]
-_CrimeKeywords  = [file for file in os.listdir('./samples') if file.startswith('crime')      and file.endswith('.txt')]
-_JudgeKeywords  = [file for file in os.listdir('./samples') if file.startswith('judge')      and file.endswith('.txt')]
+_CrimeKeywords = [file for file in os.listdir('./samples') if file.startswith('crime') and file.endswith('.txt')]
+_JudgeKeywords = [file for file in os.listdir('./samples') if file.startswith('judge') and file.endswith('.txt')]
+
 demo = gr.Interface(
     fn=analysis,
     inputs=[
@@ -168,4 +234,3 @@ demo = gr.Interface(
 )
 
 demo.launch()
-
